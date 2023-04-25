@@ -37,7 +37,7 @@ If uploading a zipped directory to Lambda, only the `index.js` and `package.json
 
 > **NOTE** - If you setup your S3 Bucket to trigger your Lambda function on every file uploaded or modified, it will run that Lambda function every time that .json file is re-uploaded, putting you into an infinite loop. Be sure and set the event trigger to only run on files with image extensions as shown below.
 
-![Lambda Settings](./lambda-settings.png)
+<img width="761" alt="Settings" src="https://user-images.githubusercontent.com/120413183/234399388-efcb251c-732f-4256-8129-d1f283e5b6a0.png">
 
 ## Documentation
 
