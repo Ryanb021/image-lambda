@@ -37,24 +37,12 @@ If uploading a zipped directory to Lambda, only the `index.js` and `package.json
 
 > **NOTE** - If you setup your S3 Bucket to trigger your Lambda function on every file uploaded or modified, it will run that Lambda function every time that .json file is re-uploaded, putting you into an infinite loop. Be sure and set the event trigger to only run on files with image extensions as shown below.
 
-<img width="761" alt="Settings" src="https://user-images.githubusercontent.com/120413183/234399388-efcb251c-732f-4256-8129-d1f283e5b6a0.png">
-
 ## Documentation
 
-- In your `README.md` include:
-  - a description of how to use your lambda.
-  - a description of any issues you encountered during deployment of this lambda.
-  - a link to your images.json file.
+- Function will upload image to S3 Bucket
+- Lambda function is deployed to AWS
 
-## Stretch Goal
+## Image
 
-- Automatically deploy your function on check-ins to your main branch using a github action.
-- HINT: Explore the GitHub marketplace.
+<img width="628" alt="Lambda Assets" src="https://user-images.githubusercontent.com/120413183/234515996-749f8fbc-55f7-4a58-bc67-9796f1d1e942.png">
 
-## Submission Instructions
-
-- Create a new repository for your lambda function, called 'image-lambda'.
-- Work on a non-main branch and make commits appropriately.
-- Update your README.md file with the required documentation above.
-- Create a pull request to your master branch with your work for this lab.
-- Submit the link to that pull request on Canvas.
