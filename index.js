@@ -1,60 +1,46 @@
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
+const {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand
+} = require('@aws-sdk/client-s3');
 
-// import * as AWS from "@aws-sdk/client-s3";
-exports.handler = async (event, context) => {
-    
-    console.log(event);
+const s3Client = new S3Client({ region: 'us-west-2' });
 
-    const bucketName = event.Records[0].s3.bucket.name;
-    const key = event.Records[0].s3.object.key;
-    const params = {
-        Bucket: bucketName,
-        Key: key
-    };
-    const file = await s3.getObject(params).promise();
- 
-    const name = key; 
-    const size = file.ContentLength;
-    const metadata = {
-        name,
-        size,
-    };
-    const images = await getImages();
-    const index = images.findIndex(image => image.name === name);
-    if (index === -1) {
-        images.push(metadata);
-    } else {
-        images[index] = metadata;
+module.exports = async (event) => {
+
+  const bucketName = event.Records[0].s3.bucket.name;
+  const fileName = event.Records[0].s3.object.key;
+  const fileSize = event.Records[0].s3.object.size;
+
+  console.log('BUCKET NAME: ' + bucketName);
+  console.log('FILE NAME: ' + fileName);
+  console.log('FILE SIZE: ' + fileSize);
+
+  const getImageManifest = {
+    Bucket: bucketName,
+    Key: 'images.json'
+  }
+
+  try {
+    const manifest = await s3Client.send(new GetObjectCommand(getImageManifest));
+    console.log(manifest);
+
+    await s3Client.send(new PutObjectCommand({
+      Bucket: bucketName,
+      Key: 'images.json'
+    }))
+  } catch (e) {
+    console.log(e);
+    if (e.Code === 'NoSuchKey') {
+      console.log('Creating new Manifest');
     }
-    await uploadImages(images);
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            message: 'uploaded successfully!',
-        }),
-    };
-}
+  }
 
-const getImages = async () => {
 
-    const params = {
-        Bucket: 'the-dark-knight-bucket',
-        Key: 'images.json'
-    };
-    try {
-        const file = await s3.getObject(params).promise();
-        return JSON.parse(file.Body.toString());
-    } catch (error) {
-        return [];
-    }
-}
-
-const uploadImages = async (images) => {
-    const params = {
-        Bucket: 'the-dark-knight-bucket',
-        Key: 'images.json',
-        Body: JSON.stringify(images)
-    };
-    return s3.upload(params).promise();
-}
+  // TODO implement
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!'),
+  };
+  return response;
+};
