@@ -1,10 +1,10 @@
-const {
+import {
   S3Client,
   GetObjectCommand,
-  PutObjectCommand
-} = require('@aws-sdk/client-s3');
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 
-const s3Client = new S3Client({ region: 'us-west-2' });
+const s3Client = new S3Client({region: 'us-west-2'});
 
 module.exports = async (event) => {
 
@@ -21,18 +21,37 @@ module.exports = async (event) => {
     Key: 'images.json'
   }
 
+  let data = {
+    fileName,
+    fileSize,
+    type: 'image',
+  }
+
   try {
     const manifest = await s3Client.send(new GetObjectCommand(getImageManifest));
-    console.log(manifest);
+    const stringifiedManifest = await manifest.Body.transformToString();
+    console.log(manifest.Body.toString());
+    console.log(stringifiedManifest);
+
+    let manifestArray= JSON.parse(stringifiedManifest);
+    manifestArray.push(data);
 
     await s3Client.send(new PutObjectCommand({
       Bucket: bucketName,
-      Key: 'images.json'
+      Key: 'images.json',
+      Body: JSON.stringify(manifestArray),
+      ContentType: 'application/json'
     }))
   } catch (e) {
     console.log(e);
     if (e.Code === 'NoSuchKey') {
       console.log('Creating new Manifest');
+      await S3Client.send(new PutObjectCommand({
+        Bucket: bucketName,
+        Key: 'images.json',
+        Body: JSON.stringify([data]),
+        ContentType: 'application/json'
+      }))
     }
   }
 
